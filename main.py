@@ -37,7 +37,6 @@ bright_orange = pygame.Color(255,83,73)
 game = Game()
 rect_len = game.settings.rect_len
 snake1 = game.snake
-snake2 = game.snake2
 pygame.init()
 fpsClock = pygame.time.Clock()
 screen = pygame.display.set_mode((game.settings.width * 15, game.settings.height * 15), pygame.RESIZABLE) #this sets the window size from what was set multiplied by 15
@@ -136,15 +135,14 @@ def game_loop(player, fps=10):
         pygame.event.pump()
 
         move = human_move1()
-        move2 = human_move2()
+        
 
-        game.do_move2(move2)
+        
         game.do_move1(move)
 
         screen.blit(backgroundimage, (0,0))
 
         game.snake.blit(rect_len, screen)
-        game.snake2.blit(rect_len, screen)
         game.strawberry.blit(screen)
         game.obstacle.blit(screen)
         game.rock.blit(screen)
@@ -197,23 +195,6 @@ def human_move1():
     move = game.direction_to_int(direction)
     return move
 
-def human_move2():
-    direction1 = snake2.facing
-    for event in pygame.event.get():
-        
-        if event.type == KEYDOWN:
-            if event.key == pygame.K_d:
-                direction1 = 'right'
-            elif event.key == pygame.K_a:
-                direction1 = 'left'
-            elif event.key == pygame.K_w:
-                direction1 = 'up'
-            elif event.key == pygame.K_s:
-                direction1 = 'down'
-            elif event.key == K_ESCAPE:
-                pygame.event.post(pygame.event.Event(QUIT))
-    move2 = game.direction_to_int(direction1)
-    return move2
 
 
 def helpmenu():
