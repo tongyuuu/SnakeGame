@@ -84,71 +84,7 @@ class Snake:
             self.position[1] += 1
         self.segments.insert(0, list(self.position))
 
-class Snake2:
-    def __init__(self):
-        
-        self.image_up = pygame.image.load('images/head_up.bmp')
-        self.image_down = pygame.image.load('images/head_down.bmp')
-        self.image_left = pygame.image.load('images/head_left.bmp')
-        self.image_right = pygame.image.load('images/head_right.bmp')
 
-        self.tail_up = pygame.image.load('images/tail_up.bmp')
-        self.tail_down = pygame.image.load('images/tail_down.bmp')
-        self.tail_left = pygame.image.load('images/tail_left.bmp')
-        self.tail_right = pygame.image.load('images/tail_right.bmp')
-            
-        self.image_body = pygame.image.load('images/body.bmp')
-
-        self.facing = "right"
-        self.initialize()
-
-    def initialize(self):
-        self.position = [12, 12]
-        self.segments = [[12 - i, 12] for i in range(3)]
-        self.score = 0
-
-    def blit_body(self, x, y, screen):
-        screen.blit(self.image_body, (x, y))
-        
-    def blit_head(self, x, y, screen):
-        if self.facing == "up":
-            screen.blit(self.image_up, (x, y))
-        elif self.facing == "down":
-            screen.blit(self.image_down, (x, y))  
-        elif self.facing == "left":
-            screen.blit(self.image_left, (x, y))  
-        else:
-            screen.blit(self.image_right, (x, y))  
-            
-    def blit_tail(self, x, y, screen):
-        tail_direction = [self.segments[-2][i] - self.segments[-1][i] for i in range(2)]
-        
-        if tail_direction == [0, -1]:
-            screen.blit(self.tail_up, (x, y))
-        elif tail_direction == [0, 1]:
-            screen.blit(self.tail_down, (x, y))  
-        elif tail_direction == [-1, 0]:
-            screen.blit(self.tail_left, (x, y))  
-        else:
-            screen.blit(self.tail_right, (x, y))  
-    
-    def blit(self, rect_len, screen):
-        self.blit_head(self.segments[0][0]*rect_len, self.segments[0][1]*rect_len, screen)                
-        for position in self.segments[1:-1]:
-            self.blit_body(position[0]*rect_len, position[1]*rect_len, screen)
-        self.blit_tail(self.segments[-1][0]*rect_len, self.segments[-1][1]*rect_len, screen)                
-            
-    
-    def update(self):
-        if self.facing == 'right':
-            self.position[0] += 1
-        if self.facing == 'left':
-            self.position[0] -= 1
-        if self.facing == 'up':
-            self.position[1] -= 1
-        if self.facing == 'down':
-            self.position[1] += 1
-        self.segments.insert(0, list(self.position))
         
 class Strawberry():
     def __init__(self, settings):
@@ -276,7 +212,6 @@ class Game:
     def __init__(self):
         self.settings = Settings()
         self.snake = Snake()
-        self.snake2 = Snake2()
         self.strawberry = Strawberry(self.settings)
         self.obstacle = Obstacle(self.settings)
         self.rock = rock(self.settings)
@@ -289,7 +224,6 @@ class Game:
         
     def restart_game(self):
         self.snake.initialize()
-        self.snake2.initialize()
         self.strawberry.initialize()
         self.obstacle.initialize()
         self.rock.initialize()
@@ -303,8 +237,6 @@ class Game:
         for position in self.snake.segments:
             state[position[1], position[0], 0] = 1
         
-        for position in self.snake2.segments:
-            state[position[1], position[0], 0] = 1
         
         state[:, :, 1] = -0.5        
 
@@ -363,24 +295,6 @@ class Game:
                     
         return reward
     
-    def do_move2(self, move):
-        move_dict = self.move_dict
-        
-        change_direction1 = move_dict[move]
-        
-        if change_direction1 == 'right' and not self.snake2.facing == 'left':
-            self.snake2.facing = change_direction1
-        if change_direction1 == 'left' and not self.snake2.facing == 'right':
-            self.snake2.facing = change_direction1
-        if change_direction1 == 'up' and not self.snake2.facing == 'down':
-            self.snake2.facing = change_direction1
-        if change_direction1 == 'down' and not self.snake2.facing == 'up':
-            self.snake2.facing = change_direction1
-
-        self.snake2.update()
-                
-        if self.game_end():
-            return -1
                     
     
     def game_end(self):
