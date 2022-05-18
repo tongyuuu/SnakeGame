@@ -51,7 +51,7 @@ file.close()
 # sounds
 crash_sound = pygame.mixer.Sound('./sound/crash.wav')
 eat_sound = pygame.mixer.Sound('./sound/eat.wav')
-lobby_music = pygame.mixer.Sound('./sound/intro2.mp3')
+#lobby_music = pygame.mixer.Sound('./sound/intro2.mp3')
 
 # images
 backgroundimage = pygame.image.load('./images/background.png')
@@ -133,7 +133,7 @@ def crash():
     pygame.mixer.Sound.play(crash_sound)
     message_display('crashed', game.settings.width / 2 * 15, game.settings.height / 3 * 15, white)
     file = open("scores.txt",'a')
-    file.write(f"{str(snake.score)}" + "\n")
+    file.write(f"{str(snake1.score)}" + "\n")
     file.close()
     file = open("scores.txt","r")
     score = file.readlines()
@@ -170,10 +170,10 @@ def initial_interface():
         screen.fill(background) #background refers to background colour
         message_display('SNAKE GAME!!', game.settings.width / 2 * 15, game.settings.height / 4 * 15)
 
-        button('Play!', "CMON!!",80, 240, 80, 40, green, bright_green, game_loop, 'human') #this is the button go and it used the function 
-        button('Quit', "No :(", 270, 240, 80, 40, red, bright_red, quitgame) #this is the button quit 
-        button('Difficulty', "u sure?", 170, 240 , 90, 40, orange, bright_orange, levels)
-        button('Help', 'nice',360 , 10, 50, 40, yellow, bright_green, helpmenu)
+        button('Play!', "CMON!!",80, 210, 80, 40, green, bright_green, game_loop, 'human') #this is the button go and it used the function 
+        button('Quit', "No :(", 270, 210, 80, 40, red, bright_red, quitgame) #this is the button quit 
+        button('Difficulty', "u sure?", 170, 210 , 90, 40, orange, bright_orange, levels)
+        button('Help', 'nice',360 , 10, 50, 40, yellow, bright_yellow, helpmenu)
         #backbuttonforlevels
 
         paragraph_display("Current difficulty: easy", 210, 300, black)
@@ -192,7 +192,10 @@ def game_loop(player, fps=10):
 
         pygame.event.pump()
 
+        move = human_move()
+
         move = human_move1()
+
         
 
         
@@ -263,6 +266,7 @@ def easy_game_loop(player, fps=10):
 
 
 
+def human_move():
 def human_move1():
     direction = snake1.facing
     for event in pygame.event.get():
@@ -300,9 +304,9 @@ def helpmenu():
 
         paragraph_display("Welcome to the python game!", 210, 100)
         paragraph_display("Please select an option below for info", 210, 130)
-        button('Controls', ':)', 100, 200, 90, 40, yellow, bright_green, helpmenucts)
-        button('Instructions', ':)', 240, 200, 90, 40, yellow, bright_green, helpmenuits)
-        button('back', ':)', 10, 360, 90, 40, yellow, bright_green, initial_interface)
+        button('Controls', ':)', 100, 200, 90, 40, yellow, bright_yellow, helpmenucts)
+        button('Instructions', ':)', 240, 200, 90, 40, yellow, bright_yellow, helpmenuits)
+        button('back', ':)', 10, 360, 90, 40, yellow, bright_yellow, initial_interface)
         
         pygame.display.update()
         pygame.time.Clock().tick(100)
@@ -321,7 +325,8 @@ def helpmenucts():
         paragraph_display("A: Move Left", 210, 190)
         paragraph_display("S: Move Backward", 210, 220)
         paragraph_display("D: Move Right", 210, 250)
-        button('back', ':)', 170, 300, 90, 40, yellow, bright_green, helpmenu)
+        paragraph_display("Enter: Pause", 210, 280)
+        button('back', ':)', 170, 320, 90, 40, yellow, bright_yellow, helpmenu)
 
         pygame.display.update()
         pygame.time.Clock().tick(50)
@@ -340,7 +345,7 @@ def helpmenuits():
         paragraph_display("food that randomly generates", 210, 190)
         paragraph_display("Be careful to not hit the walls", 210, 220)
         paragraph_display("or your own tail if it gets long!", 210, 250)
-        button('back', ':)', 170, 300, 90, 40, yellow, bright_green, helpmenu)
+        button('back', ':)', 170, 300, 90, 40, yellow, bright_yellow, helpmenu)
 
         pygame.display.update()
         pygame.time.Clock().tick(50)
@@ -355,7 +360,7 @@ def levels():
     
         screen.fill(background)
         
-        backbuttonforlevels
+        #backbuttonforlevels
         message_display('Choose your level', 210 , 100)
         paragraph_display(f"Highscore: {file2.readline()}",210,300,black)
 
@@ -363,7 +368,7 @@ def levels():
         button('Easy', "u dum",80, 180, 80, 40, green, bright_green, difficulty_easy)
         button('Hard', "nice choice", 170, 180 , 90, 40, orange, bright_orange, difficulty_medium)
         button('XTREME', "have fun", 270, 180, 80, 40, red, bright_red, difficulty_hard)
-        button('back', ':)', 20, 360, 90, 40, yellow, bright_green, initial_interface)
+        button('back', ':)', 20, 360, 90, 40, yellow, bright_yellow, initial_interface)
 
 
         pygame.display.update()
