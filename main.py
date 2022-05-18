@@ -148,6 +148,7 @@ def game_loop(player, fps=10):
         game.rock.blit(screen)
         game.rock2.blit(screen)
         game.rock3.blit(screen)
+        game.rock4.blit(screen)
         game.blit_score(white, screen)
 
         pygame.display.flip()
