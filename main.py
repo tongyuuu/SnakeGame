@@ -10,7 +10,7 @@ from webbrowser import BackgroundBrowser
 from numpy import full
 import pygame #importing module pygame
 import time #importing time module 
-from pygame.locals import KEYDOWN, K_RIGHT, K_LEFT, K_UP, K_DOWN, K_ESCAPE, K_s, K_a, K_w, K_d #importing the keys 
+from pygame.locals import KEYDOWN, K_RIGHT, K_LEFT, K_UP, K_DOWN, K_ESCAPE, K_RETURN #importing the keys 
 #key_down means that a key has been pressed
 from pygame.locals import QUIT
 from pygame import VIDEORESIZE, K_f, mixer
@@ -20,7 +20,7 @@ from game import rock2, rock3
 
 black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
-background = pygame.Color(0, 100, 0)
+background = pygame.Color(100, 45, 69)
 
 #all colors
 green = pygame.Color(0, 200, 0)
@@ -41,10 +41,17 @@ pygame.init()
 fpsClock = pygame.time.Clock()
 screen = pygame.display.set_mode((game.settings.width * 15, game.settings.height * 15), pygame.RESIZABLE) #this sets the window size from what was set multiplied by 15
 pygame.display.set_caption('SnakeGame') #names the window 
+
 monitor_size = [pygame.display.Info().current_w,pygame.display.Info().current_h]
+file = open("highscore.txt","r")
+displayscore = file.readline()
+file.close()
+
+
 # sounds
 crash_sound = pygame.mixer.Sound('./sound/crash.wav')
 eat_sound = pygame.mixer.Sound('./sound/eat.wav')
+lobby_music = pygame.mixer.Sound('./sound/intro2.mp3')
 
 # images
 backgroundimage = pygame.image.load('./images/background.png')
@@ -88,20 +95,67 @@ def button(msg, altmsg, x, y, w, h, inactive_color, active_color, action=None, p
         pygame.draw.rect(screen, inactive_color, (x, y, w, h))
 
     smallText = pygame.font.SysFont('merriweather', 20)
+
     TextSurf, TextRect = text_objects(msg, smallText)
     TextRect.center = (x + (w / 2), y + (h / 2))
     screen.blit(TextSurf, TextRect)
 
+def pause_screen_message(msg, x, y, w, h, inactive_color):
+    pygame.draw.rect(screen, inactive_color, (x, y, w, h))
+    smallText = pygame.font.SysFont('comicsansms', 20)
+    TextSurf, TextRect = text_objects(msg, smallText)
+    TextRect.center = (x + (w / 2), y + (h / 2))
+    screen.blit(TextSurf, TextRect)
 
 def quitgame():
     pygame.quit()
     quit()
 
+def pause():
+    paused = True
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    quit() # this is not good, need to know how pygame.quit works
+            if event.type == pygame.KEYDOWN:
+                if event.key == K_RETURN:
+                    paused = False
+        screen.fill(white)
+        message_display('PAUSED', game.settings.width / 2 * 15, game.settings.height / 4 * 15)
+        pause_screen_message('Press ENTER to continue', 165, 240, 80, 40, white)
+        pygame.display.update()
+        pygame.time.Clock().tick(15)
+
 
 def crash():
     pygame.mixer.Sound.play(crash_sound)
     message_display('crashed', game.settings.width / 2 * 15, game.settings.height / 3 * 15, white)
-    time.sleep(1)
+    file = open("scores.txt",'a')
+    file.write(f"{str(snake.score)}" + "\n")
+    file.close()
+    file = open("scores.txt","r")
+    score = file.readlines()
+    i = 0
+    check = 0
+    highscore = 0
+    while i < len(score):
+        num = int(score[i])
+        if check < num:
+            highscore = num
+            check = num
+            i = i + 1
+        else:
+            i = i + 1
+    file2 = open("highscore.txt","w")
+    highscore = str(highscore)
+    file2.write(highscore)
+    file2.close
+
+        
+
+
 
 
 def initial_interface():
@@ -110,7 +164,9 @@ def initial_interface():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-
+        #mixer.music.load('./sound/intro2.mp3') keeps flickering cuz the intro screen is flickering for some reason
+       #mixer.music.play(-1) this will play on repeat
+        file2 = open("highscore.txt","r")
         screen.fill(background) #background refers to background colour
         message_display('SNAKE GAME!!', game.settings.width / 2 * 15, game.settings.height / 4 * 15)
 
@@ -118,11 +174,13 @@ def initial_interface():
         button('Quit', "No :(", 270, 240, 80, 40, red, bright_red, quitgame) #this is the button quit 
         button('Difficulty', "u sure?", 170, 240 , 90, 40, orange, bright_orange, levels)
         button('Help', 'nice',360 , 10, 50, 40, yellow, bright_green, helpmenu)
+        #backbuttonforlevels
 
         paragraph_display("Current difficulty: easy", 210, 300, black)
-
+        paragraph_display(f"Highscore: {file2.readline()}",210,350,black)
         pygame.display.update()
         pygame.time.Clock().tick(15)
+    file2.close()
 
 
 def game_loop(player, fps=10):
@@ -175,6 +233,35 @@ def resize_screen():
                         screen = pygame.display.set_mode(monitor_size, pygame.RESIZABLE)
         pygame.display.update()
 
+def easy_game_loop(player, fps=10):
+
+
+    game.restart_game()
+
+
+    while not game.game_end():
+
+        pygame.event.pump()
+
+        move = human_move()
+
+        game.do_move(move)
+
+        screen.blit(backgroundimage, (0,0))
+
+        game.snake.blit(rect_len, screen)
+        game.strawberry.blit(screen)
+        game.food.blit(screen)
+        game.obstacle.blit(screen)
+        game.blit_score(white, screen)
+
+        pygame.display.flip()
+
+        fpsClock.tick(fps)
+
+    crash()
+
+
 
 def human_move1():
     direction = snake1.facing
@@ -193,6 +280,11 @@ def human_move1():
                 direction = 'down'
             if event.key == K_ESCAPE:
                 pygame.event.post(pygame.event.Event(QUIT))
+            if event.key == K_RETURN:
+                #pause button here
+                pause()
+
+
     move = game.direction_to_int(direction)
     return move
 
@@ -256,26 +348,32 @@ def helpmenuits():
 def levels():
     intro = True
     while intro:
+        file2 = open("highscore.txt","r")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
     
         screen.fill(background)
         
-        message_display('Choose your level', 210 , 240)
+        backbuttonforlevels
+        message_display('Choose your level', 210 , 100)
+        paragraph_display(f"Highscore: {file2.readline()}",210,300,black)
 
 
-        button('Easy', "u dum",80, 100, 80, 40, green, bright_green, difficulty_easy)
-        button('Hard', "nice choice", 170, 100 , 90, 40, orange, bright_orange, difficulty_medium)
-        button('XTREME', "have fun", 270, 100, 80, 40, red, bright_red, difficulty_hard)
+        button('Easy', "u dum",80, 180, 80, 40, green, bright_green, difficulty_easy)
+        button('Hard', "nice choice", 170, 180 , 90, 40, orange, bright_orange, difficulty_medium)
+        button('XTREME', "have fun", 270, 180, 80, 40, red, bright_red, difficulty_hard)
+        button('back', ':)', 20, 360, 90, 40, yellow, bright_green, initial_interface)
 
 
         pygame.display.update()
-        pygame.time.Clock().tick(50)
+        pygame.time.Clock().tick(15)
+    file2.close()
+
 
 
 def difficulty_easy():
-    game_loop("human",10)
+    easy_game_loop("human",10)
 
 def difficulty_medium():
     game_loop("human",20)
