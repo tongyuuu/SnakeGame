@@ -7,14 +7,16 @@ Created on Wed May 16 15:22:20 2018
 
 from turtle import back
 from webbrowser import BackgroundBrowser
+from numpy import full
 import pygame #importing module pygame
 import time #importing time module 
 from pygame.locals import KEYDOWN, K_RIGHT, K_LEFT, K_UP, K_DOWN, K_ESCAPE, K_RETURN #importing the keys 
 #key_down means that a key has been pressed
 from pygame.locals import QUIT
-from pygame import mixer
-
+from pygame import VIDEORESIZE, K_f, mixer
+import sys 
 from game import Game, Obstacle, rock
+from game import rock2, rock3
 
 black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
@@ -34,11 +36,13 @@ bright_orange = pygame.Color(255,83,73)
 
 game = Game()
 rect_len = game.settings.rect_len
-snake = game.snake
+snake1 = game.snake
 pygame.init()
 fpsClock = pygame.time.Clock()
-screen = pygame.display.set_mode((game.settings.width * 15, game.settings.height * 15)) #this sets the window size from what was set multiplied by 15
+screen = pygame.display.set_mode((game.settings.width * 15, game.settings.height * 15), pygame.RESIZABLE) #this sets the window size from what was set multiplied by 15
 pygame.display.set_caption('SnakeGame') #names the window 
+
+monitor_size = [pygame.display.Info().current_w,pygame.display.Info().current_h]
 file = open("highscore.txt","r")
 displayscore = file.readline()
 file.close()
@@ -129,7 +133,7 @@ def crash():
     pygame.mixer.Sound.play(crash_sound)
     message_display('crashed', game.settings.width / 2 * 15, game.settings.height / 3 * 15, white)
     file = open("scores.txt",'a')
-    file.write(f"{str(snake.score)}" + "\n")
+    file.write(f"{str(snake1.score)}" + "\n")
     file.close()
     file = open("scores.txt","r")
     score = file.readlines()
@@ -166,10 +170,10 @@ def initial_interface():
         screen.fill(background) #background refers to background colour
         message_display('SNAKE GAME!!', game.settings.width / 2 * 15, game.settings.height / 4 * 15)
 
-        button('Play!', "CMON!!",80, 240, 80, 40, green, bright_green, game_loop, 'human') #this is the button go and it used the function 
-        button('Quit', "No :(", 270, 240, 80, 40, red, bright_red, quitgame) #this is the button quit 
-        button('Difficulty', "u sure?", 170, 240 , 90, 40, orange, bright_orange, levels)
-        button('Help', 'nice',360 , 10, 50, 40, yellow, bright_green, helpmenu)
+        button('Play!', "CMON!!",80, 210, 80, 40, green, bright_green, game_loop, 'human') #this is the button go and it used the function 
+        button('Quit', "No :(", 270, 210, 80, 40, red, bright_red, quitgame) #this is the button quit 
+        button('Difficulty', "u sure?", 170, 210 , 90, 40, orange, bright_orange, levels)
+        button('Help', 'nice',360 , 10, 50, 40, yellow, bright_yellow, helpmenu)
         #backbuttonforlevels
 
         paragraph_display("Current difficulty: easy", 210, 300, black)
@@ -184,14 +188,15 @@ def game_loop(player, fps=10):
 
     game.restart_game()
 
-
     while not game.game_end():
 
         pygame.event.pump()
 
         move = human_move()
+        
 
-        game.do_move(move)
+        
+        game.do_move1(move)
 
         screen.blit(backgroundimage, (0,0))
 
@@ -199,6 +204,9 @@ def game_loop(player, fps=10):
         game.strawberry.blit(screen)
         game.obstacle.blit(screen)
         game.rock.blit(screen)
+        game.rock2.blit(screen)
+        game.rock3.blit(screen)
+        game.rock4.blit(screen)
         game.blit_score(white, screen)
 
         pygame.display.flip()
@@ -206,6 +214,24 @@ def game_loop(player, fps=10):
         fpsClock.tick(fps)
 
     crash()
+
+def resize_screen():
+    fullscreen = False
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+            elif event.type == VIDEORESIZE:
+                if not fullscreen:
+                    screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+            elif event.type == KEYDOWN:
+                if event.key == K_f:
+                    fullscreen = not fullscreen
+                    if fullscreen:
+                        screen = pygame.display.set_mode(monitor_size, pygame.FULLSCREEN)
+                    else:
+                        screen = pygame.display.set_mode(monitor_size, pygame.RESIZABLE)
+        pygame.display.update()
 
 def easy_game_loop(player, fps=10):
 
@@ -236,21 +262,21 @@ def easy_game_loop(player, fps=10):
     crash()
 
 
-def human_move():
-    direction = snake.facing
 
+def human_move():
+    direction = snake1.facing
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
-
+    
         elif event.type == KEYDOWN:
-            if event.key == K_RIGHT or event.key == ord('d'):
+            if event.key == K_RIGHT:
                 direction = 'right'
-            if event.key == K_LEFT or event.key == ord('a'):
+            if event.key == K_LEFT:
                 direction = 'left'
-            if event.key == K_UP or event.key == ord('w'):
+            if event.key == K_UP:
                 direction = 'up'
-            if event.key == K_DOWN or event.key == ord('s'):
+            if event.key == K_DOWN:
                 direction = 'down'
             if event.key == K_ESCAPE:
                 pygame.event.post(pygame.event.Event(QUIT))
@@ -263,6 +289,7 @@ def human_move():
     return move
 
 
+
 def helpmenu():
     intro = True
     while intro:
@@ -273,9 +300,9 @@ def helpmenu():
 
         paragraph_display("Welcome to the python game!", 210, 100)
         paragraph_display("Please select an option below for info", 210, 130)
-        button('Controls', ':)', 100, 200, 90, 40, yellow, bright_green, helpmenucts)
-        button('Instructions', ':)', 240, 200, 90, 40, yellow, bright_green, helpmenuits)
-        button('back', ':)', 10, 360, 90, 40, yellow, bright_green, initial_interface)
+        button('Controls', ':)', 100, 200, 90, 40, yellow, bright_yellow, helpmenucts)
+        button('Instructions', ':)', 240, 200, 90, 40, yellow, bright_yellow, helpmenuits)
+        button('back', ':)', 10, 360, 90, 40, yellow, bright_yellow, initial_interface)
         
         pygame.display.update()
         pygame.time.Clock().tick(100)
@@ -294,7 +321,8 @@ def helpmenucts():
         paragraph_display("A: Move Left", 210, 190)
         paragraph_display("S: Move Backward", 210, 220)
         paragraph_display("D: Move Right", 210, 250)
-        button('back', ':)', 170, 300, 90, 40, yellow, bright_green, helpmenu)
+        paragraph_display("Enter: Pause", 210, 280)
+        button('back', ':)', 170, 320, 90, 40, yellow, bright_yellow, helpmenu)
 
         pygame.display.update()
         pygame.time.Clock().tick(50)
@@ -313,7 +341,7 @@ def helpmenuits():
         paragraph_display("food that randomly generates", 210, 190)
         paragraph_display("Be careful to not hit the walls", 210, 220)
         paragraph_display("or your own tail if it gets long!", 210, 250)
-        button('back', ':)', 170, 300, 90, 40, yellow, bright_green, helpmenu)
+        button('back', ':)', 170, 300, 90, 40, yellow, bright_yellow, helpmenu)
 
         pygame.display.update()
         pygame.time.Clock().tick(50)
@@ -336,7 +364,7 @@ def levels():
         button('Easy', "u dum",80, 180, 80, 40, green, bright_green, difficulty_easy)
         button('Hard', "nice choice", 170, 180 , 90, 40, orange, bright_orange, difficulty_medium)
         button('XTREME', "have fun", 270, 180, 80, 40, red, bright_red, difficulty_hard)
-        button('back', ':)', 20, 360, 90, 40, yellow, bright_green, initial_interface)
+        button('back', ':)', 20, 360, 90, 40, yellow, bright_yellow, initial_interface)
 
 
         pygame.display.update()
