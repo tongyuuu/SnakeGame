@@ -7,14 +7,16 @@ Created on Wed May 16 15:22:20 2018
 
 from turtle import back
 from webbrowser import BackgroundBrowser
+from numpy import full
 import pygame #importing module pygame
 import time #importing time module 
 from pygame.locals import KEYDOWN, K_RIGHT, K_LEFT, K_UP, K_DOWN, K_ESCAPE, K_RETURN #importing the keys 
 #key_down means that a key has been pressed
 from pygame.locals import QUIT
-from pygame import mixer
-
+from pygame import VIDEORESIZE, K_f, mixer
+import sys 
 from game import Game, Obstacle, rock
+from game import rock2, rock3
 
 black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
@@ -34,11 +36,13 @@ bright_orange = pygame.Color(255,83,73)
 
 game = Game()
 rect_len = game.settings.rect_len
-snake = game.snake
+snake1 = game.snake
 pygame.init()
 fpsClock = pygame.time.Clock()
-screen = pygame.display.set_mode((game.settings.width * 15, game.settings.height * 15)) #this sets the window size from what was set multiplied by 15
+screen = pygame.display.set_mode((game.settings.width * 15, game.settings.height * 15), pygame.RESIZABLE) #this sets the window size from what was set multiplied by 15
 pygame.display.set_caption('SnakeGame') #names the window 
+
+monitor_size = [pygame.display.Info().current_w,pygame.display.Info().current_h]
 file = open("highscore.txt","r")
 displayscore = file.readline()
 file.close()
@@ -184,14 +188,15 @@ def game_loop(player, fps=10):
 
     game.restart_game()
 
-
     while not game.game_end():
 
         pygame.event.pump()
 
-        move = human_move()
+        move = human_move1()
+        
 
-        game.do_move(move)
+        
+        game.do_move1(move)
 
         screen.blit(backgroundimage, (0,0))
 
@@ -199,6 +204,9 @@ def game_loop(player, fps=10):
         game.strawberry.blit(screen)
         game.obstacle.blit(screen)
         game.rock.blit(screen)
+        game.rock2.blit(screen)
+        game.rock3.blit(screen)
+        game.rock4.blit(screen)
         game.blit_score(white, screen)
 
         pygame.display.flip()
@@ -206,6 +214,24 @@ def game_loop(player, fps=10):
         fpsClock.tick(fps)
 
     crash()
+
+def resize_screen():
+    fullscreen = False
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+            elif event.type == VIDEORESIZE:
+                if not fullscreen:
+                    screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+            elif event.type == KEYDOWN:
+                if event.key == K_f:
+                    fullscreen = not fullscreen
+                    if fullscreen:
+                        screen = pygame.display.set_mode(monitor_size, pygame.FULLSCREEN)
+                    else:
+                        screen = pygame.display.set_mode(monitor_size, pygame.RESIZABLE)
+        pygame.display.update()
 
 def easy_game_loop(player, fps=10):
 
@@ -236,21 +262,21 @@ def easy_game_loop(player, fps=10):
     crash()
 
 
-def human_move():
-    direction = snake.facing
 
+def human_move1():
+    direction = snake1.facing
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
-
+    
         elif event.type == KEYDOWN:
-            if event.key == K_RIGHT or event.key == ord('d'):
+            if event.key == K_RIGHT:
                 direction = 'right'
-            if event.key == K_LEFT or event.key == ord('a'):
+            if event.key == K_LEFT:
                 direction = 'left'
-            if event.key == K_UP or event.key == ord('w'):
+            if event.key == K_UP:
                 direction = 'up'
-            if event.key == K_DOWN or event.key == ord('s'):
+            if event.key == K_DOWN:
                 direction = 'down'
             if event.key == K_ESCAPE:
                 pygame.event.post(pygame.event.Event(QUIT))
@@ -261,6 +287,7 @@ def human_move():
 
     move = game.direction_to_int(direction)
     return move
+
 
 
 def helpmenu():
