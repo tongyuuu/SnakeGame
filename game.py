@@ -206,6 +206,29 @@ class rock3():
     def initialize(self):
         self.position = [random.randint(0,28), random.randint(0,28)]
 
+class rock4():
+    def __init__(self, settings):
+        self.settings = settings
+        self.style = str(random.randint(1, 8))
+        self.image = pygame.image.load('images/rock.png')     
+        self.initialize()
+        
+    def random_pos(self, snake):
+        self.style = str(random.randint(1, 8))
+        self.image = pygame.image.load('images/rock.png')         
+        
+        self.position[0] = random.randint(0, self.settings.width-1)
+        self.position[1] = random.randint(0, self.settings.height-1)
+
+        self.position[0] = random.randint(9, 19)
+        self.position[1] = random.randint(9, 19)
+        
+    def blit(self, screen):
+        screen.blit(self.image, [p * self.settings.rect_len for p in self.position])
+
+    def initialize(self):
+        self.position = [random.randint(0,28), random.randint(0,28)]
+
 class Game:
     """
     """
@@ -217,6 +240,7 @@ class Game:
         self.rock = rock(self.settings)
         self.rock2 = rock2(self.settings)
         self.rock3 = rock3(self.settings)
+        self.rock4 = rock4(self.settings)
         self.move_dict = {0 : 'up',
                           1 : 'down',
                           2 : 'left',
@@ -229,6 +253,7 @@ class Game:
         self.rock.initialize()
         self.rock2.initialize()
         self.rock3.initialize()
+        self.rock4.initialize()
 
     def current_state(self):         
         state = np.zeros((self.settings.width+2, self.settings.height+2, 2))
@@ -245,6 +270,7 @@ class Game:
         state[self.rock.position[1], self.rock.position[0], 1] = 0.5
         state[self.rock2.position[1], self.rock2.position[0], 1] = 0.5
         state[self.rock3.position[1], self.rock3.position[0], 1] = 0.5
+        state[self.rock4.position[1], self.rock4.position[0], 1] = 0.5
 
         for d in expand:
             state[self.strawberry.position[1]+d[0], self.strawberry.position[0]+d[1], 1] = 0.5
@@ -256,6 +282,8 @@ class Game:
             state[self.rock2.position[1]+d[0], self.rock2.position[0]+d[1], 1] = 0.5
         for d in expand:
             state[self.rock3.position[1]+d[0], self.rock3.position[0]+d[1], 1] = 0.5
+        for d in expand:
+            state[self.rock4.position[1]+d[0], self.rock4.position[0]+d[1], 1] = 0.5
         return state
 
 
@@ -310,6 +338,8 @@ class Game:
         if self.snake.position[0] == self.rock2.position[0] and self.snake.position[1] == self.rock2.position[1]:
             end = True
         if self.snake.position[0] == self.rock3.position[0] and self.snake.position[1] == self.rock3.position[1]:
+            end = True
+        if self.snake.position[0] == self.rock4.position[0] and self.snake.position[1] == self.rock4.position[1]:
             end = True
         if self.snake.segments[0] in self.snake.segments[1:]:
             end = True
