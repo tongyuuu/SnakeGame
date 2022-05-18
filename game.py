@@ -109,7 +109,36 @@ class Strawberry():
         screen.blit(self.image, [p * self.settings.rect_len for p in self.position])
    
     def initialize(self):
+        self.position = [15, 10]
+
+class food():
+    def __init__(self, settings):
+        self.settings = settings
+        
+        self.style = str(random.randint(1, 8))
+        self.image = pygame.image.load('images/food' + str(self.style) + '.bmp')        
+        self.initialize()
+        
+    def random_pos(self, snake):
+        self.style = str(random.randint(1, 8))
+        self.image = pygame.image.load('images/food' + str(self.style) + '.bmp')                
+        
+        self.position[0] = random.randint(0, self.settings.width-1)
+        self.position[1] = random.randint(0, self.settings.height-1)
+
+        self.position[0] = random.randint(9, 19)
+        self.position[1] = random.randint(9, 19)
+        
+        if self.position in snake.segments:
+            self.random_pos(snake)
+
+    def blit(self, screen):
+        screen.blit(self.image, [p * self.settings.rect_len for p in self.position])
+   
+    def initialize(self):
+        self.position = [15, 10]
         self.position = [random.randint(0,28), random.randint(0,28)]
+
       
 class Obstacle():
     def __init__(self, settings):
@@ -164,6 +193,7 @@ class Game:
         self.settings = Settings()
         self.snake = Snake()
         self.strawberry = Strawberry(self.settings)
+        self.food = food(self.settings)
         self.obstacle = Obstacle(self.settings)
         self.rock = rock(self.settings)
         self.move_dict = {0 : 'up',
@@ -174,6 +204,7 @@ class Game:
     def restart_game(self):
         self.snake.initialize()
         self.strawberry.initialize()
+        self.food.initialize()
         self.obstacle.initialize()
         self.rock.initialize()
 
@@ -187,11 +218,13 @@ class Game:
         state[:, :, 1] = -0.5        
 
         state[self.strawberry.position[1], self.strawberry.position[0], 1] = 0.5
+        state[self.food.position[1], self.food.position[0], 1] = 0.5
         state[self.obstacle.position[1], self.obstacle.position[0], 1] = 0.5
         state[self.rock.position[1], self.rock.position[0], 1] = 0.5
 
         for d in expand:
             state[self.strawberry.position[1]+d[0], self.strawberry.position[0]+d[1], 1] = 0.5
+            state[self.food.position[1]+d[0], self.food.position[0]+d[1], 1] = 0.5
         for d in expand:
              state[self.obstacle.position[1]+d[0], self.obstacle.position[0]+d[1], 1] = 0.5
         for d in expand:
@@ -223,6 +256,11 @@ class Game:
         
         if self.snake.position == self.strawberry.position:
             self.strawberry.random_pos(self.snake)
+            pygame.mixer.Sound.play(eat_sound)
+            reward = 1
+            self.snake.score += 1
+        elif self.snake.position == self.food.position:
+            self.food.random_pos(self.snake)
             pygame.mixer.Sound.play(eat_sound)
             reward = 1
             self.snake.score += 1
