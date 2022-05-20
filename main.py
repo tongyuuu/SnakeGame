@@ -160,17 +160,17 @@ def crash():
 
 def initial_interface():
     intro = True
+    #pygame.mixer.music.load('./sound/intro2.mp3')
+    #pygame.mixer.music.play(-1, 0.0)
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        #mixer.music.load('./sound/intro2.mp3') keeps flickering cuz the intro screen is flickering for some reason
-       #mixer.music.play(-1) this will play on repeat
         file2 = open("highscore.txt","r")
         screen.fill(background) #background refers to background colour
         message_display('SNAKE GAME!!', game.settings.width / 2 * 15, game.settings.height / 4 * 15)
 
-        button('Play!', "CMON!!",80, 210, 80, 40, green, bright_green, game_loop, 'human') #this is the button go and it used the function 
+        button('Play!', "CMON!!",80, 210, 80, 40, green, bright_green, easy_game_loop, 'human') #this is the button go and it used the function 
         button('Quit', "No :(", 270, 210, 80, 40, red, bright_red, quitgame) #this is the button quit 
         button('Difficulty', "u sure?", 170, 210 , 90, 40, orange, bright_orange, levels)
         button('Help', 'nice',360 , 10, 50, 40, yellow, bright_yellow, helpmenu)
@@ -180,6 +180,7 @@ def initial_interface():
         paragraph_display(f"Highscore: {file2.readline()}",210,350,black)
         pygame.display.update()
         pygame.time.Clock().tick(15)
+        #pygame.mixer.music.play(0)
     file2.close()
 
 
@@ -245,7 +246,7 @@ def easy_game_loop(player, fps=10):
 
         move = human_move()
 
-        game.do_move(move)
+        game.do_move1(move)
 
         screen.blit(backgroundimage, (0,0))
 
