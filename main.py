@@ -20,7 +20,8 @@ from game import rock2, rock3
 
 black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
-background = pygame.Color(100, 45, 69)
+background = pygame.Color(205,149,12)
+pausecolour = pygame.Color(250,235,215)
 
 #all colors
 green = pygame.Color(0, 200, 0)
@@ -122,9 +123,9 @@ def pause():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_RETURN:
                     paused = False
-        screen.fill(white)
+        screen.fill(pausecolour)
         message_display('PAUSED', game.settings.width / 2 * 15, game.settings.height / 4 * 15)
-        pause_screen_message('Press ENTER to continue', 165, 240, 80, 40, white)
+        pause_screen_message('Press ENTER to continue', 165, 240, 80, 40, pausecolour)
         pygame.display.update()
         pygame.time.Clock().tick(15)
 
@@ -160,17 +161,17 @@ def crash():
 
 def initial_interface():
     intro = True
+    pygame.mixer.music.load('./sound/intro2.mp3')
+    pygame.mixer.music.play(-1, 0.0)
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        #mixer.music.load('./sound/intro2.mp3') keeps flickering cuz the intro screen is flickering for some reason
-       #mixer.music.play(-1) this will play on repeat
         file2 = open("highscore.txt","r")
         screen.fill(background) #background refers to background colour
         message_display('SNAKE GAME!!', game.settings.width / 2 * 15, game.settings.height / 4 * 15)
 
-        button('Play!', "CMON!!",80, 210, 80, 40, green, bright_green, game_loop, 'human') #this is the button go and it used the function 
+        button('Play!', "CMON!!",80, 210, 80, 40, green, bright_green, easy_game_loop, 'human') #this is the button go and it used the function 
         button('Quit', "No :(", 270, 210, 80, 40, red, bright_red, quitgame) #this is the button quit 
         button('Difficulty', "u sure?", 170, 210 , 90, 40, orange, bright_orange, levels)
         button('Help', 'nice',360 , 10, 50, 40, yellow, bright_yellow, helpmenu)
@@ -180,6 +181,7 @@ def initial_interface():
         paragraph_display(f"Highscore: {file2.readline()}",210,350,black)
         pygame.display.update()
         pygame.time.Clock().tick(15)
+        #pygame.mixer.music.play(0)
     file2.close()
 
 
@@ -193,11 +195,6 @@ def game_loop(player, fps=10):
         pygame.event.pump()
 
         move = human_move()
-
-        move = human_move1()
-
-        
-
         
         game.do_move1(move)
 
@@ -248,7 +245,7 @@ def easy_game_loop(player, fps=10):
 
         move = human_move()
 
-        game.do_move(move)
+        game.do_move1(move)
 
         screen.blit(backgroundimage, (0,0))
 
@@ -267,7 +264,6 @@ def easy_game_loop(player, fps=10):
 
 
 def human_move():
-def human_move1():
     direction = snake1.facing
     for event in pygame.event.get():
         if event.type == QUIT:

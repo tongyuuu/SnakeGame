@@ -118,12 +118,12 @@ class food():
         self.settings = settings
         
         self.style = str(random.randint(1, 8))
-        self.image = pygame.image.load('images/food' + str(self.style) + '.bmp')        
+        self.image = pygame.image.load('images/food' + str(self.style) + '.png')        
         self.initialize()
         
     def random_pos(self, snake):
         self.style = str(random.randint(1, 8))
-        self.image = pygame.image.load('images/food' + str(self.style) + '.bmp')                
+        self.image = pygame.image.load('images/food' + str(self.style) + '.png')                
         
         self.position[0] = random.randint(0, self.settings.width-1)
         self.position[1] = random.randint(0, self.settings.height-1)
