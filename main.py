@@ -195,11 +195,6 @@ def game_loop(player, fps=10):
         pygame.event.pump()
 
         move = human_move()
-
-        move = human_move1()
-
-        
-
         
         game.do_move1(move)
 
@@ -269,7 +264,6 @@ def easy_game_loop(player, fps=10):
 
 
 def human_move():
-def human_move1():
     direction = snake1.facing
     for event in pygame.event.get():
         if event.type == QUIT:
