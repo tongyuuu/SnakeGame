@@ -20,7 +20,8 @@ from game import rock2, rock3
 
 black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
-background = pygame.Color(100, 45, 69)
+background = pygame.Color(205,149,12)
+pausecolour = pygame.Color(250,235,215)
 
 #all colors
 green = pygame.Color(0, 200, 0)
@@ -122,9 +123,9 @@ def pause():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_RETURN:
                     paused = False
-        screen.fill(white)
+        screen.fill(pausecolour)
         message_display('PAUSED', game.settings.width / 2 * 15, game.settings.height / 4 * 15)
-        pause_screen_message('Press ENTER to continue', 165, 240, 80, 40, white)
+        pause_screen_message('Press ENTER to continue', 165, 240, 80, 40, pausecolour)
         pygame.display.update()
         pygame.time.Clock().tick(15)
 
@@ -160,8 +161,8 @@ def crash():
 
 def initial_interface():
     intro = True
-    #pygame.mixer.music.load('./sound/intro2.mp3')
-    #pygame.mixer.music.play(-1, 0.0)
+    pygame.mixer.music.load('./sound/intro2.mp3')
+    pygame.mixer.music.play(-1, 0.0)
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
