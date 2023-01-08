@@ -1,4 +1,4 @@
-#Snake Game 
+## Snake Game 
 
 Includes Powerups and other fun easter eggs
 
